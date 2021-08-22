@@ -2,7 +2,7 @@
   "name": "bloxplorer",
   "version": "1.0.0",
   "description": "Ethereum block explorer",
-  "main": "app.js",
+  "main": "bloxplorer.js",
   "scripts": {
     "test": "mocha"
   },
