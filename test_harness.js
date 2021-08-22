@@ -8,32 +8,33 @@ const bloxplorer = new Bloxplore(process.env.INFURA_ENDPOINT);
 console.log(
   'Getting your reports. Please be patient, this could take a while.'
 );
-bloxplorer.getBlockData(startingBlock, endingBlock).then((result) => {
+bloxplorer.getBlockData(1).then((result) => {
   if (result) {
+    console.clear();
     const statistics = [
       {
-        Description: 'Total value of ether transferred',
-        Value: bloxplorer.totalEtherTransferred,
+        description: 'Total value of ether transferred',
+        value: bloxplorer.totalEtherTransferred,
       },
       {
-        Description: 'Number of unique addresses sent a transaction',
-        Value: bloxplorer.sendingAddresses.size,
+        description: 'Number of unique addresses sent a transaction',
+        value: bloxplorer.sendingAddresses.size,
       },
       {
-        Description: 'Number of unique addresses received a transaction',
-        Value: bloxplorer.receivingAddresses.size,
+        description: 'Number of unique addresses received a transaction',
+        value: bloxplorer.receivingAddresses.size,
       },
       {
-        Description: 'Number of contracts created',
-        Value: bloxplorer.contractsCreated,
+        description: 'Number of contracts created',
+        value: bloxplorer.contractsCreated,
       },
       {
-        Description: 'Number of uncles created',
-        Value: bloxplorer.unclesCount,
+        description: 'Number of uncles created',
+        value: bloxplorer.unclesCount,
       },
     ];
 
-    console.log('\n--== Statistics ==--\n');
+    console.log('\n--== Block Statistics ==--\n');
     console.table(statistics);
 
     bloxplorer.getSendersReport().then((report) => {

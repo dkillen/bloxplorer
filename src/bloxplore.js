@@ -31,18 +31,16 @@ class Bloxplore {
   /**
    * Returns the data of a block or for a range of blocks.
    * @param  {...number} params - A single positive integer (offset), or two positive integers (starting and ending block numbers).
-   * @returns {boolean} - Success or failure
+   * @returns {boolean} - success or failure
    */
   getBlockData = async (...params) => {
-    /**
-     * Save away the number of parameters to help with parameter checks and
-     * store the parameters in an array that can be modified.
-     */
+    // Save away the number of parameters to help with parameter checks.
     let parameterCount = params.length;
-    // const params = [...args];
 
     // Get the current block number
-    const currentBlock = await this.web3.eth.getBlockNumber();
+    const currentBlock = await this.web3.eth
+      .getBlockNumber()
+      .catch((error) => this._handleWeb3Error(error));
 
     /**
      * Check parameters. If no parameter supplied, more than two parameters supplied, or
@@ -56,8 +54,29 @@ class Bloxplore {
       parameterCount = 1;
       params[0] = 1;
       console.log(
-        'Error: Method getBlockData: Incorrect number of arguments. Getting data for the current block.'
+        'Error: Method getBlockData: Incorrect number of parameters. Getting data for the current block instead.'
       );
+    }
+
+    // Ensure that all arguments are a number or can be parsed to a number.
+    if (parameterCount === 1) {
+      params[0] = parseInt(params[0]);
+      if (isNaN(params[0])) {
+        params[0] = 1;
+        console.log(
+          'Error: Method getBlockData: Invalid parameter. Getting data for the current block instead.'
+        );
+      }
+    } else {
+      params[0] = parseInt(params[0]);
+      params[1] = parseInt(params[1]);
+      if (isNaN(params[0]) || isNaN(params[1])) {
+        parameterCount = 1;
+        params[0] = 1;
+        console.log(
+          'Error: Method getBlockData: Invalid parameter. Getting data for the current block instead.'
+        );
+      }
     }
 
     // Check parameters when two suppied. They cannot be greater than the current block number.
@@ -65,17 +84,11 @@ class Bloxplore {
       parameterCount === 2 &&
       (params[0] > currentBlock || params[1] > currentBlock)
     ) {
-      // Handle error
-    }
-
-    // Ensure that all arguments are a number or can be parsed to a number.
-    for (let param of params) {
-      if (typeof param !== 'number') {
-        console.error(
-          'Error: Method getBlockData: Argument(s) must be a number!'
-        );
-        return false;
-      }
+      parameterCount = 1;
+      params[0] = 1;
+      console.log(
+        'Error: Method getBlockData: Out of bounds - parameter greater than the current block number. Getting data for the current block instead.'
+      );
     }
 
     /**
@@ -87,9 +100,7 @@ class Bloxplore {
       if (params[0] === 1) {
         this.blockData = await this.web3.eth
           .getBlock(currentBlock, true)
-          .catch((e) => {
-            console.log;
-          });
+          .catch((error) => this._handleWeb3Error(error));
         this._processTransactions(this.blockData.transactions);
       } else {
         const startBlock = currentBlock - (params[0] - 1);
@@ -129,7 +140,7 @@ class Bloxplore {
 
   /**
    * Returns a receiving address transaction report - for use with console.table() to output a formatted table of data.
-   * @returns {Array} - Objects representing a receiving address and value of ether transferred.
+   * @returns {Array} - Objects representing a receiving address, value of ether transferred, and contract boolean.
    */
   getReceiversReport = async () => {
     const receiversReport = [];
@@ -158,7 +169,9 @@ class Bloxplore {
    * @returns {boolean} - true if the address is a contract otherwise false.
    */
   _isContractAddress = async (address) => {
-    const code = await this.web3.eth.getCode(address);
+    const code = await this.web3.eth
+      .getCode(address)
+      .catch((error) => this._handleWeb3Error(error));
     if (code !== '0x' && !this.contractAddresses.has(address)) {
       this.contractAddresses.add(address);
       return true;
@@ -225,15 +238,31 @@ class Bloxplore {
   _getBlocks = async (_startBlock, _endBlock) => {
     let blockData = [];
     for (let i = _startBlock; i <= _endBlock; i++) {
-      const block = await this.web3.eth.getBlock(i, true).catch((e) => {
-        console.log;
-      });
+      const block = await this.web3.eth
+        .getBlock(i, true)
+        .catch((error) => this._handleWeb3Error(error));
       blockData.push(block);
       this.unclesCount += block.uncles.length;
       this._processTransactions(block.transactions);
     }
     return blockData;
   };
+
+  _handleWeb3Error = (error) => {
+    throw new Web3Error(error.message);
+  };
+}
+
+/**
+ * Error class for errors encountered uaing Web3 RPCs
+ */
+class Web3Error extends Error {
+  constructor(message) {
+    super(message);
+  }
+  get name() {
+    return 'Web3Error';
+  }
 }
 
 module.exports = Bloxplore;
