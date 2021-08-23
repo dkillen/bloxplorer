@@ -30,7 +30,9 @@ class Bloxplore {
 
   /**
    * Returns the data of a block or for a range of blocks.
-   * @param  {...number} params - A single positive integer (offset), or two positive integers (starting and ending block numbers).
+   * @param  {...number} params - A single positive integer or zero (offset), or two positive integers (starting and ending block numbers).
+   * When a single parameter is supplied it acts like a zero based array in that zero represents the current block. A parameter of n will
+   * get n+1 blocks - the current block and n block(s) before it.
    * @returns {boolean} - success or failure
    */
   getBlockData = async (...params) => {
@@ -46,13 +48,9 @@ class Bloxplore {
      * Check parameters. If no parameter supplied, more than two parameters supplied, or
      * one parameter with a value of 0 then get the current block.
      */
-    if (
-      parameterCount === 0 ||
-      parameterCount > 2 ||
-      (parameterCount === 1 && params[0] === 0)
-    ) {
+    if (parameterCount === 0 || parameterCount > 2) {
       parameterCount = 1;
-      params[0] = 1;
+      params[0] = 0;
       console.log(
         'Error: Method getBlockData: Incorrect number of parameters. Getting data for the current block instead.'
       );
@@ -62,7 +60,7 @@ class Bloxplore {
     if (parameterCount === 1) {
       params[0] = parseInt(params[0]);
       if (isNaN(params[0])) {
-        params[0] = 1;
+        params[0] = 0;
         console.log(
           'Error: Method getBlockData: Invalid parameter. Getting data for the current block instead.'
         );
@@ -72,7 +70,7 @@ class Bloxplore {
       params[1] = parseInt(params[1]);
       if (isNaN(params[0]) || isNaN(params[1])) {
         parameterCount = 1;
-        params[0] = 1;
+        params[0] = 0;
         console.log(
           'Error: Method getBlockData: Invalid parameter. Getting data for the current block instead.'
         );
@@ -85,7 +83,7 @@ class Bloxplore {
       (params[0] > currentBlock || params[1] > currentBlock)
     ) {
       parameterCount = 1;
-      params[0] = 1;
+      params[0] = 0;
       console.log(
         'Error: Method getBlockData: Out of bounds - parameter greater than the current block number. Getting data for the current block instead.'
       );
@@ -97,13 +95,13 @@ class Bloxplore {
      * the range where the starting block is currentBlock - (offset - 1).
      */
     if (parameterCount === 1) {
-      if (params[0] === 1) {
+      if (params[0] === 0) {
         this.blockData = await this.web3.eth
           .getBlock(currentBlock, true)
           .catch((error) => this._handleWeb3Error(error));
         this._processTransactions(this.blockData.transactions);
       } else {
-        const startBlock = currentBlock - (params[0] - 1);
+        const startBlock = currentBlock - params[0];
         this.blockData = await this._getBlocks(startBlock, currentBlock);
       }
     } else {

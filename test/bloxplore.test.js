@@ -16,14 +16,14 @@ describe('Block Explorer', () => {
     [sender1, receiver1, sender2, receiver2, contractCreater] =
       await web3.eth.getAccounts();
 
-    // How much test ether to send in a transaction
-    const transactionValue = '1';
-
     // Deploy a contract on the test network to test against.
     testContract = await new web3.eth.Contract(interface)
       .deploy({ data: bytecode })
       .send({ from: contractCreater, gas: '1000000' });
     contractAddress = testContract._address;
+
+    // How much test ether to send in a transaction
+    const transactionValue = '1';
 
     // Transactions on the test network to test against.
     await web3.eth.sendTransaction({
@@ -52,68 +52,68 @@ describe('Block Explorer', () => {
   });
 
   it('should get a block', async () => {
-    const result = await this.bloxplorer.getBlockData(1);
+    const result = await this.bloxplorer.getBlockData(0);
     expect(result).to.be.true;
   });
 
   it('should get the current block', async () => {
     const currentBlock = await web3.eth.getBlockNumber();
-    await this.bloxplorer.getBlockData(1);
+    await this.bloxplorer.getBlockData(0);
     expect(this.bloxplorer.blockData.number).to.equal(currentBlock);
   });
 
   it('should get the number of contracts created', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.contractsCreated).to.equal(1);
   });
 
   it('should get the total ether transferred', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.totalEtherTransferred).to.equal(4);
   });
 
   it('should get the uncles count', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.unclesCount).to.equal(0);
   });
 
   it('should get the receiving addresses', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.receivingAddresses.has(receiver1));
     expect(this.bloxplorer.receivingAddresses.has(receiver2));
   });
 
   it('should get the sending addresses', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.sendingAddresses.has(sender1));
     expect(this.bloxplorer.sendingAddresses.has(sender2));
   });
 
   it('should get the total value of ether received by an address', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.receivingAddresses.get(receiver1)).to.equal(1);
     expect(this.bloxplorer.receivingAddresses.get(receiver2)).to.equal(1);
   });
 
-  it('should get the total value of ether send by an address', async () => {
-    await this.bloxplorer.getBlockData(5);
+  it('should get the total value of ether sent by an address', async () => {
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.sendingAddresses.get(sender1)).to.equal(2);
     expect(this.bloxplorer.sendingAddresses.get(sender2)).to.equal(2);
   });
 
   it('should get the address of a contract', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     await this.bloxplorer.getReceiversReport();
     expect(this.bloxplorer.contractAddresses.has(contractAddress));
   });
 
   it('should get the number of unique addresses sending transactions', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.sendingAddresses.size).to.equal(2);
   });
 
   it('should get the number of unique addresses receiving transactions', async () => {
-    await this.bloxplorer.getBlockData(5);
+    await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.receivingAddresses.size).to.equal(3);
   });
 });
