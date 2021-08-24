@@ -1,5 +1,6 @@
 const expect = require('chai').expect;
-
+const assert = require('chai').assert;
+const stdout = require('test-console').stdout;
 const ganache = require('ganache-cli');
 const Web3 = require('web3');
 const web3 = new Web3(ganache.provider());
@@ -60,6 +61,49 @@ describe('Block Explorer', () => {
     const currentBlock = await web3.eth.getBlockNumber();
     await this.bloxplorer.getBlockData(0);
     expect(this.bloxplorer.blockData.number).to.equal(currentBlock);
+  });
+
+  it('should get blocks when two parameters supplied', async () => {
+    await this.bloxplorer.getBlockData(1, 5);
+    expect(this.bloxplorer.totalEtherTransferred).to.equal(4);
+    expect(this.bloxplorer.receivingAddresses.get(receiver1)).to.equal(1);
+    expect(this.bloxplorer.receivingAddresses.get(receiver2)).to.equal(1);
+    expect(this.bloxplorer.sendingAddresses.get(sender1)).to.equal(2);
+    expect(this.bloxplorer.sendingAddresses.get(sender2)).to.equal(2);
+    expect(this.bloxplorer.contractAddresses.has(contractAddress));
+  });
+
+  it('should get the current block when no parameter supplied', async () => {
+    const currentBlock = await web3.eth.getBlockNumber();
+    const inspect = stdout.inspect();
+    await this.bloxplorer.getBlockData();
+    inspect.restore();
+    expect(this.bloxplorer.blockData.number).to.equal(currentBlock);
+    expect(inspect.output[0]).to.equal(
+      'Error: Method getBlockData: Incorrect number of parameters. Getting data for the current block instead.\n'
+    );
+  });
+
+  it('should get the current block when non-numeric parameter supplied', async () => {
+    const currentBlock = await web3.eth.getBlockNumber();
+    const inspect = stdout.inspect();
+    await this.bloxplorer.getBlockData('asdf');
+    inspect.restore();
+    expect(this.bloxplorer.blockData.number).to.equal(currentBlock);
+    expect(inspect.output[0]).to.equal(
+      'Error: Method getBlockData: Invalid parameter. Getting data for the current block instead.\n'
+    );
+  });
+
+  it('should get the current block when parameter greater than current block number', async () => {
+    const currentBlock = await web3.eth.getBlockNumber();
+    const inspect = stdout.inspect();
+    await this.bloxplorer.getBlockData(100, 101);
+    inspect.restore();
+    expect(this.bloxplorer.blockData.number).to.equal(currentBlock);
+    expect(inspect.output[0]).to.equal(
+      'Error: Method getBlockData: Out of bounds - parameter greater than the current block number. Getting data for the current block instead.\n'
+    );
   });
 
   it('should get the number of contracts created', async () => {

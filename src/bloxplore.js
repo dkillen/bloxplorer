@@ -42,7 +42,7 @@ class Bloxplore {
     // Get the current block number
     const currentBlock = await this.web3.eth
       .getBlockNumber()
-      .catch((error) => this._handleWeb3Error(error));
+      .catch((error) => this._handleWeb3Error(error, 'eth.getBlockNumber'));
 
     /**
      * Check parameters. If no parameter supplied, more than two parameters supplied, or
@@ -98,7 +98,7 @@ class Bloxplore {
       if (params[0] === 0) {
         this.blockData = await this.web3.eth
           .getBlock(currentBlock, true)
-          .catch((error) => this._handleWeb3Error(error));
+          .catch((error) => this._handleWeb3Error(error, 'eth.getBlock'));
         this._processTransactions(this.blockData.transactions);
       } else {
         const startBlock = currentBlock - params[0];
@@ -169,7 +169,7 @@ class Bloxplore {
   _isContractAddress = async (address) => {
     const code = await this.web3.eth
       .getCode(address)
-      .catch((error) => this._handleWeb3Error(error));
+      .catch((error) => this._handleWeb3Error(error, 'eth.getCode'));
     if (code !== '0x' && !this.contractAddresses.has(address)) {
       this.contractAddresses.add(address);
       return true;
@@ -238,7 +238,7 @@ class Bloxplore {
     for (let i = _startBlock; i <= _endBlock; i++) {
       const block = await this.web3.eth
         .getBlock(i, true)
-        .catch((error) => this._handleWeb3Error(error));
+        .catch((error) => this._handleWeb3Error(error, 'eth.getBlock'));
       blockData.push(block);
       this.unclesCount += block.uncles.length;
       this._processTransactions(block.transactions);
@@ -246,8 +246,13 @@ class Bloxplore {
     return blockData;
   };
 
-  _handleWeb3Error = (error) => {
-    throw new Web3Error(error.message);
+  /**
+   * Hnadler for errors thrown by Web3 methods
+   * @param {Object} error - the error object.
+   * @param {string} method - the name of the method called.
+   */
+  _handleWeb3Error = (error, method) => {
+    throw new Web3Error(error.message, method);
   };
 }
 
@@ -255,8 +260,10 @@ class Bloxplore {
  * Error class for errors encountered uaing Web3 RPCs
  */
 class Web3Error extends Error {
-  constructor(message) {
-    super(message);
+  constructor(message, method) {
+    const msg = `An error occured when calling ${method}. Error message: ${message}`;
+    super(msg);
+    this.method = method;
   }
   get name() {
     return 'Web3Error';
