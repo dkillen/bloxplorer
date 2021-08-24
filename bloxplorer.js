@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 require('dotenv').config();
-// const yargs = require('yargs/yargs');
 const Bloxplore = require('./src/bloxplore');
 
+// Set up command-line parameters and help information.
 const argv = require('yargs/yargs')(process.argv.slice(2))
   .usage('Usage: $0 number [number] [options]')
   .example('$0 0', 'Display a transfer report for the current block.')
@@ -31,6 +31,7 @@ const argv = require('yargs/yargs')(process.argv.slice(2))
   .help('h')
   .alias('h', 'help').argv;
 
+// Instantiate the Bloxplore class given the Infura endpoint supplied in the .env file
 const bloxplorer = new Bloxplore(process.env.INFURA_ENDPOINT);
 
 const args = argv._;
@@ -48,16 +49,18 @@ if (args.length === 1) {
       if (result) {
         console.clear();
 
+        // Generate statistics for the block and display the report.
         const statistics = generateStats();
-
         console.log('\n--== Block Statistics ==--\n');
         console.table(statistics);
         console.log();
 
+        // Display Ether Senders Report if -s or -f options used.
         if (getSenderReport || getFullReport) {
           displaySendersReport();
         }
 
+        // Display Ether Receivers Report if -r or -f options used.
         if (getReceiversReport || getFullReport) {
           displayReceiversReport();
         }
@@ -75,16 +78,18 @@ if (args.length === 1) {
       if (result) {
         console.clear();
 
+        // Generate statistics for the blocks and display the report.
         const statistics = generateStats();
-
         console.log('\n--== Block Statistics ==--\n');
         console.table(statistics);
         console.log();
 
+        // Display Ether Senders Report if -s or -f options used.
         if (getSenderReport || getFullReport) {
           displaySendersReport();
         }
 
+        // Display Ether Receivers Report if -r or -f options used.
         if (getReceiversReport || getFullReport) {
           displayReceiversReport();
         }
@@ -97,6 +102,10 @@ if (args.length === 1) {
     });
 }
 
+/**
+ * Generate statistics report for the block or blocks
+ * @returns {Array} - Statistics report for the block or blocks
+ */
 const generateStats = () => {
   const statistics = [
     {
@@ -123,6 +132,9 @@ const generateStats = () => {
   return statistics;
 };
 
+/**
+ * Display the Ether Senders Report
+ */
 const displaySendersReport = () => {
   bloxplorer
     .getSendersReport()
@@ -138,6 +150,9 @@ const displaySendersReport = () => {
     });
 };
 
+/**
+ * Display the Ether Receivers Report
+ */
 const displayReceiversReport = () => {
   bloxplorer
     .getReceiversReport()
