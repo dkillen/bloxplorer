@@ -40,9 +40,12 @@ class Bloxplore {
     let parameterCount = params.length;
 
     // Get the current block number
-    const currentBlock = await this.web3.eth
-      .getBlockNumber()
-      .catch((error) => this._handleWeb3Error(error, 'eth.getBlockNumber'));
+    let currentBlock = 0;
+    try {
+      currentBlock = await this.web3.eth.getBlockNumber();
+    } catch (error) {
+      this._handleWeb3Error(error, 'eth.getBlockNumber');
+    }
 
     /**
      * Check parameters. If no parameter supplied, more than two parameters supplied, or
@@ -96,9 +99,11 @@ class Bloxplore {
      */
     if (parameterCount === 1) {
       if (params[0] === 0) {
-        this.blockData = await this.web3.eth
-          .getBlock(currentBlock, true)
-          .catch((error) => this._handleWeb3Error(error, 'eth.getBlock'));
+        try {
+          this.blockData = await this.web3.eth.getBlock(currentBlock, true);
+        } catch (error) {
+          this._handleWeb3Error(error, 'eth.getBlock');
+        }
         this._processTransactions(this.blockData.transactions);
       } else {
         const startBlock = currentBlock - params[0];
@@ -167,9 +172,12 @@ class Bloxplore {
    * @returns {boolean} - true if the address is a contract otherwise false.
    */
   _isContractAddress = async (address) => {
-    const code = await this.web3.eth
-      .getCode(address)
-      .catch((error) => this._handleWeb3Error(error, 'eth.getCode'));
+    let code;
+    try {
+      code = await this.web3.eth.getCode(address);
+    } catch (error) {
+      this._handleWeb3Error(error, 'eth.getCode');
+    }
     if (code !== '0x' && !this.contractAddresses.has(address)) {
       this.contractAddresses.add(address);
       return true;
@@ -236,9 +244,12 @@ class Bloxplore {
   _getBlocks = async (_startBlock, _endBlock) => {
     let blockData = [];
     for (let i = _startBlock; i <= _endBlock; i++) {
-      const block = await this.web3.eth
-        .getBlock(i, true)
-        .catch((error) => this._handleWeb3Error(error, 'eth.getBlock'));
+      let block;
+      try {
+        block = await this.web3.eth.getBlock(i, true);
+      } catch (error) {
+        this._handleWeb3Error(error, 'eth.getBlock');
+      }
       blockData.push(block);
       this.unclesCount += block.uncles.length;
       this._processTransactions(block.transactions);

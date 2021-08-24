@@ -160,4 +160,16 @@ describe('Block Explorer', () => {
     await this.bloxplorer.getBlockData(4);
     expect(this.bloxplorer.receivingAddresses.size).to.equal(3);
   });
+
+  it('should get an ether senders report', async () => {
+    await this.bloxplorer.getBlockData(4);
+    const report = await this.bloxplorer.getSendersReport();
+    expect(report.length).to.equal(2);
+  });
+
+  it('should get an ether receivers report', async () => {
+    await this.bloxplorer.getBlockData(4);
+    const report = await this.bloxplorer.getReceiversReport();
+    expect(report.length).to.equal(3);
+  });
 });

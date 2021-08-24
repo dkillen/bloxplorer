@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require('dotenv').config();
-const yargs = require('yargs/yargs');
+// const yargs = require('yargs/yargs');
 const Bloxplore = require('./src/bloxplore');
 
 const argv = require('yargs/yargs')(process.argv.slice(2))
@@ -42,45 +42,59 @@ console.log(
   '\nGetting your reports. Please be patient, this could take a while.\n'
 );
 if (args.length === 1) {
-  bloxplorer.getBlockData(args[0]).then((result) => {
-    if (result) {
-      console.clear();
+  bloxplorer
+    .getBlockData(args[0])
+    .then((result) => {
+      if (result) {
+        console.clear();
 
-      const statistics = generateStats();
+        const statistics = generateStats();
 
-      console.log('\n--== Block Statistics ==--\n');
-      console.table(statistics);
-      console.log();
+        console.log('\n--== Block Statistics ==--\n');
+        console.table(statistics);
+        console.log();
 
-      if (getSenderReport || getFullReport) {
-        displaySendersReport();
+        if (getSenderReport || getFullReport) {
+          displaySendersReport();
+        }
+
+        if (getReceiversReport || getFullReport) {
+          displayReceiversReport();
+        }
       }
-
-      if (getReceiversReport || getFullReport) {
-        displayReceiversReport();
-      }
-    }
-  });
+    })
+    .catch((err) => {
+      console.log(
+        `\n*** An error occured while processing your request. Error message: ${err.message}\n`
+      );
+    });
 } else {
-  bloxplorer.getBlockData(args[0], args[1]).then((result) => {
-    if (result) {
-      console.clear();
+  bloxplorer
+    .getBlockData(args[0], args[1])
+    .then((result) => {
+      if (result) {
+        console.clear();
 
-      const statistics = generateStats();
+        const statistics = generateStats();
 
-      console.log('\n--== Block Statistics ==--\n');
-      console.table(statistics);
-      console.log();
+        console.log('\n--== Block Statistics ==--\n');
+        console.table(statistics);
+        console.log();
 
-      if (getSenderReport || getFullReport) {
-        displaySendersReport();
+        if (getSenderReport || getFullReport) {
+          displaySendersReport();
+        }
+
+        if (getReceiversReport || getFullReport) {
+          displayReceiversReport();
+        }
       }
-
-      if (getReceiversReport || getFullReport) {
-        displayReceiversReport();
-      }
-    }
-  });
+    })
+    .catch((err) => {
+      console.log(
+        `\n*** An error occured while processing your request. Error message: ${err.message}\n`
+      );
+    });
 }
 
 const generateStats = () => {
@@ -110,17 +124,31 @@ const generateStats = () => {
 };
 
 const displaySendersReport = () => {
-  bloxplorer.getSendersReport().then((report) => {
-    console.log('--== Ether Senders Report ==--\n');
-    console.table(report);
-    console.log();
-  });
+  bloxplorer
+    .getSendersReport()
+    .then((report) => {
+      console.log('--== Ether Senders Report ==--\n');
+      console.table(report);
+      console.log();
+    })
+    .catch((err) => {
+      console.log(
+        `\n*** An error occured while processing your request. Error message: ${err.message}\n`
+      );
+    });
 };
 
 const displayReceiversReport = () => {
-  bloxplorer.getReceiversReport().then((report) => {
-    console.log('--== Ether Receivers Report ==--\n');
-    console.table(report);
-    console.log();
-  });
+  bloxplorer
+    .getReceiversReport()
+    .then((report) => {
+      console.log('--== Ether Receivers Report ==--\n');
+      console.table(report);
+      console.log();
+    })
+    .catch((err) => {
+      console.log(
+        `\n*** An error occured while processing your request. Error message: ${err.message}\n`
+      );
+    });
 };
