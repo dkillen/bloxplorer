@@ -104,14 +104,17 @@ class Bloxplore {
         } catch (error) {
           this._handleWeb3Error(error, 'eth.getBlock');
         }
-        this._processTransactions(this.blockData.transactions);
+        this.transactions.push(...this.blockData.transactions);
+        this._processTransactions();
       } else {
         const startBlock = currentBlock - params[0];
         this.blockData = await this._getBlocks(startBlock, currentBlock);
+        this._processTransactions();
       }
     } else {
       // If two arguments are passed in get the data for that range of blocks.
       this.blockData = await this._getBlocks(params[0], params[1]);
+      this._processTransactions();
     }
     return true;
   };
@@ -189,9 +192,8 @@ class Bloxplore {
    * Processes an array of transactions to extract the data and set instance properties.
    * @param {Array} transactions - The transactions to process for their data.
    */
-  _processTransactions(transactions) {
-    for (let transaction of transactions) {
-      this.transactions.push(transaction);
+  _processTransactions() {
+    for (let transaction of this.transactions) {
       const sender = transaction.from;
       const receiver = transaction.to;
 
@@ -252,7 +254,7 @@ class Bloxplore {
       }
       blockData.push(block);
       this.unclesCount += block.uncles.length;
-      this._processTransactions(block.transactions);
+      this.transactions.push(...block.transactions);
     }
     return blockData;
   };
