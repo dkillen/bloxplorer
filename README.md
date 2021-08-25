@@ -22,7 +22,7 @@ $ npm install
 
 ## Running tests
 
-The test directory provides a suite of unit tests (including a simple solidity smart contract). The unit tests are run against instances of the Bloxplore class. The unit tests will also generate both text and html code coverage reports. Run the tests with:
+The test directory provides a suite of unit tests (including a simple solidity smart contract). The unit tests are run against instances of the Bloxplore class. The unit tests will run a local ganache-cli blockchain for testing purposes. The unit tests will also generate both text and html code coverage reports. Run the tests with:
 
 ```
 $ npm test
