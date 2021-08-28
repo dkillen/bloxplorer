@@ -1,4 +1,5 @@
 const Web3 = require('web3');
+const Web3Error = require('./errors');
 
 /**
  * Class encapsulating Ethereum block data and methods to manipulate and analyse that data.
@@ -267,20 +268,6 @@ class Bloxplore {
   _handleWeb3Error = (error, method) => {
     throw new Web3Error(error.message, method);
   };
-}
-
-/**
- * Error class for errors encountered uaing Web3 RPCs
- */
-class Web3Error extends Error {
-  constructor(message, method) {
-    const msg = `An error occured when calling ${method}. Error message: ${message}`;
-    super(msg);
-    this.method = method;
-  }
-  get name() {
-    return 'Web3Error';
-  }
 }
 
 module.exports = Bloxplore;
