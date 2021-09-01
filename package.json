@@ -18,6 +18,7 @@
     "test-console": "^2.0.0"
   },
   "dependencies": {
+    "sqlite3": "^5.0.2",
     "web3": "^1.5.2",
     "yargs": "^16.2.0"
   }

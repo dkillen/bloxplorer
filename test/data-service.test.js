@@ -6,7 +6,8 @@ const web3 = new Web3(ganache.provider());
 
 const { interface, bytecode } = require('./contracts/compile');
 
-const BlockDataService = require('../src/block-data-service');
+const SQLiteDataStore = require('../src/data-service/sqlite-data-store');
+const BlockDataService = require('../src/data-service/block-data-service');
 
 describe('Block Data Service', () => {
   let sender1, receiver1, sender2, receiver2, contractCreater, contractAddress;
@@ -48,7 +49,11 @@ describe('Block Data Service', () => {
     });
 
     // Create an instance of BlockDataService using the local test network
-    this.blockDataService = new BlockDataService(web3.currentProvider);
+    const testDataStore = new SQLiteDataStore('test.sqlite');
+    this.blockDataService = new BlockDataService(
+      web3.currentProvider,
+      testDataStore
+    );
   });
 
   describe('getBlock()', () => {
