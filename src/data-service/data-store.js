@@ -12,10 +12,17 @@ class DataStore {
   };
 
   /**
-   * When implemented this method should store the block data in the data store
+   * When implemented this method should store the block data in the data store.
    * @param {Object} _blockData
    */
   storeBlockData = (_blockData) => {
+    throw new Error('Abstract method.');
+  };
+
+  /**
+   * When implemented this method should close the connection to the data store.
+   */
+  closeConnection = () => {
     throw new Error('Abstract method.');
   };
 }
